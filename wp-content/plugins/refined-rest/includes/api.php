@@ -65,8 +65,8 @@ function extend_api() {
       $html = apply_filters( 'the_content', $filtered_content );
 
       return array(
-        'rendered' => strip_tags( $html, $allowed_tags ),
-        'plaintext' => wp_strip_all_tags( $html ),
+        'rendered' => preg_replace( '/\\n/m', '', strip_tags( $html, $allowed_tags ) ),
+        'plaintext' => preg_replace( '/(?<=\\n\\n)\\n/m', '', wp_strip_all_tags( $html ) ),
       );
     },
     'schema' => array(
