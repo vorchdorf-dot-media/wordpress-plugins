@@ -1,7 +1,7 @@
 <?php
 
 /* Code below only works on PHP 7.4+ */
-$allowed_tags = ['p', 'a', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'strong', 'em', 'i', 'blockquote', 'cite', 'ul', 'ol', 'li', 'table', 'thead', 'tbody', 'tfoot', 'th', 'td'];
+$allowed_tags = ['p', 'a', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'strong', 'em', 'i', 'blockquote', 'cite', 'ul', 'ol', 'li', 'table', 'thead', 'tbody', 'tfoot', 'th', 'td', 'pre', 'code'];
 
 add_action( 'rest_api_init', 'extend_api' );
 
@@ -15,12 +15,35 @@ function extend_api() {
       return get_attachments($post_id);
     },
     'schema' => array(
-      'type' => array(
-        array(
+      'type' => 'array',
+      'items' => array(
+        'type' => 'object',
+        'properties' => array(
           'caption' => 'string',
           'height' => 'int',
           'id' => 'int',
-          'meta' => 'string',
+          'meta' => array(
+            'type' => 'object',
+            'properties' => array(
+              'aperture' => 'string',
+              'credit' => 'string',
+              'camera' => 'string',
+              'caption' => 'string',
+              'created_timestamp' => 'string',
+              'copyright' => 'string',
+              'focal_length' => 'string',
+              'iso' => 'string',
+              'shutter_speed' => 'string',
+              'title' => 'string',
+              'orientation' => 'string',
+              'keywords' => array(
+                'type' => 'array',
+                'items' => array(
+                  'type' => 'string',
+                ),
+              ),
+            ),
+          ),
           'mimetype' => 'string',
           'post_date' => 'string',
           'post_modified' => 'string',
@@ -47,7 +70,8 @@ function extend_api() {
       );
     },
     'schema' => array(
-      'type' => array(
+      'type' => 'object',
+      'properties' => array(
         'rendered' => 'string',
         'plaintext' => 'string'
       ),
