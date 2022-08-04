@@ -9,10 +9,12 @@ class RefinedRESTAttachments {
   private function map_attachment() {
     $attachment_id = $this->attachments->id();
     $attached_file = get_post( $attachment_id );
+    $alt_text = get_post_meta($attachment_id , '_wp_attachment_image_alt', true);
     $metadata = wp_get_attachment_metadata( $attachment_id );
     $caption = wp_strip_all_tags( $this->attachments->field('caption') );
 
     return array(
+      'alt' => $alt_text,
       'caption' => $caption,
       'height' => (int) $metadata['height'],
       'id' => (int) $attachment_id,
@@ -30,10 +32,12 @@ class RefinedRESTAttachments {
     $meta = json_decode( $attachment['meta'] );
 
     $attached_file = get_post( $meta->id );
+    $alt_text = get_post_meta($meta->id , '_wp_attachment_image_alt', true);
     $metadata = wp_get_attachment_metadata( $meta->id );
 
     return array(
-      'caption' => $attachment['caption'],
+      'alt' => $alt_text,
+      'caption' => $attachment['caption'] ? $attachment['caption'] : $attached_file->post_excerpt,
       'height' => (int) $metadata['height'],
       'id' => (int) $meta->id,
       'meta' => $metadata['image_meta'],
@@ -72,8 +76,22 @@ class RefinedRESTAttachments {
     }
   }
 
+  public function get_featured_media() {
+    $post_thumbnail_id = get_post_thumbnail_id( $this->id );
+
+    if ($post_thumbnail_id) {
+      $attachment = array(
+        "meta" => "{ \"id\": {$post_thumbnail_id} }"
+      );
+
+      return array( $this->map_inline_attachment( $attachment ) );
+    }
+
+    return [];
+  }
+
   public function get_attachments() {
-    $attached = $this->get_inline_attachments();
+    $attached = array_merge( $this->get_featured_media(), $this->get_inline_attachments() );
 
     if ( !isset( $this->attachments ) || !$this->attachments->exist() ) {
       return $attached;

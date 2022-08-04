@@ -19,6 +19,7 @@ function extend_api() {
       'items' => array(
         'type' => 'object',
         'properties' => array(
+          'alt' => 'string',
           'caption' => 'string',
           'height' => 'int',
           'id' => 'int',
